@@ -61,10 +61,11 @@ endif
 
 inc_dir = include_directories(
   'src/includes',
+  'subprojects/raylib'
 )
 
 sources = files(
-  'src/main.c',
+  'src/game/main.c',
 )
 
 executable(
