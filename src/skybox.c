@@ -8,8 +8,8 @@
     #define GLSL_VERSION            100
 #endif
 
-Mesh cube;
-Model skybox;
+static Mesh cube;
+static Model skybox;
 
 void initSkybox(void)
 {
@@ -31,6 +31,7 @@ void initSkybox(void)
                                     TextFormat("../resources/shaders/glsl%i/cubemap.fs", GLSL_VERSION));
 
     SetShaderValue(shdrCubemap, GetShaderLocation(shdrCubemap, "equirectangularMap"), (int[1]){ 0 }, SHADER_UNIFORM_INT);
+    UnloadShader(shdrCubemap);  // Clean up cubemap shader
 
     Image img = LoadImage("../resources/img/skybox.png");
     skybox.materials[0].maps[MATERIAL_MAP_CUBEMAP].texture = LoadTextureCubemap(img, CUBEMAP_LAYOUT_AUTO_DETECT);    // CUBEMAP_LAYOUT_PANORAMA

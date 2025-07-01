@@ -3,6 +3,7 @@
 #include "shaders.h"
 #include "skybox.h"
 #include <stdio.h>
+#include "terrain.h"
 
 #include "raymath.h"
 
@@ -50,7 +51,7 @@ int main(void)
     Shader shader;
     initShaders(&shader);
 
-    // Clear here
+    // TODO: Clear these models here
     Model modelA;
     Model modelB;
     Model modelC;
@@ -73,10 +74,10 @@ int main(void)
     modelC.materials[0].shader = shader;
 
     // Create a plane mesh and model
-    Mesh planeMesh = GenMeshPlane(32, 32, 50, 50);
-    Model planeModel = LoadModelFromMesh(planeMesh);
-    planeModel.materials[0].shader = shader;
-    planeModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    Mesh terrainMesh = GenTerrainMesh();
+    Model terrainModel = LoadModelFromMesh(terrainMesh);
+    terrainModel.materials[0].shader = shader;
+    terrainModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
 
     //--------------------------------------------------------------------------------------
@@ -124,14 +125,14 @@ int main(void)
         BeginMode3D(camera);
         drawSkybox();
 
-        // Draw the three models
+        // Draw the three models TODO: clear these models later
         DrawModel(modelA, (Vector3){ 10.6f, 40, 0 }, 1.0f, WHITE);
         DrawModel(modelB, (Vector3){ -2.6f, 40, 0 }, 1.0f, WHITE);
         DrawModel(modelC, (Vector3){ 2.6f, 40, 0 }, 1.0f, WHITE);
 
         for (int i = -20; i < 20; i += 2) DrawModel(modelA,(Vector3){ (float)i, 0, 2 }, 1.0f, WHITE);
 
-        DrawModel(planeModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, (Color){115, 196, 197, 255}); // Draw ground
+        DrawModel(terrainModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, (Color){115, 196, 197, 255}); // Draw ground
 
         EndMode3D();
         EndDrawing();

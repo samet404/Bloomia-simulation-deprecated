@@ -67,4 +67,6 @@ dkms.conf
 [Bb]uild
 
 # Caches
-*GLCache*
+*GLCache*g
+
+.trash
