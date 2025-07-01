@@ -50,7 +50,7 @@ int main(void)
                 GetMouseDelta().x*0.05f,                            // Rotation: yaw
                 GetMouseDelta().y*0.05f,                            // Rotation: pitch
                 0.0f                                                // Rotation: roll
-            }, 1.0f); // Move to target (zoom)
+            }, 0); // Move to target (zoom)
 
         //----------------------------------------------------------------------------------
         // Draw

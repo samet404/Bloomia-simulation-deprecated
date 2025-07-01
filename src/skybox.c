@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "rlgl.h"
+#include "skybox.h"
 
 #if defined(PLATFORM_DESKTOP)
     #define GLSL_VERSION            330
@@ -22,8 +23,8 @@ void initSkybox(void)
                                             TextFormat("../resources/shaders/glsl%i/skybox.fs", GLSL_VERSION));
 
     SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "environmentMap"), (int[1]){ MATERIAL_MAP_CUBEMAP }, SHADER_UNIFORM_INT);
-    SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "doGamma"), (int[1]) { useHDR ? 1 : 0 }, SHADER_UNIFORM_INT);
-    SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "vflipped"), (int[1]){ useHDR ? 1 : 0 }, SHADER_UNIFORM_INT);
+    SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "doGamma"), (int[1]) { 0 }, SHADER_UNIFORM_INT);
+    SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "vflipped"), (int[1]){ 0 }, SHADER_UNIFORM_INT);
 
     // Load cubemap shader and setup required shader locations
     Shader shdrCubemap = LoadShader(TextFormat("../resources/shaders/glsl%i/cubemap.vs", GLSL_VERSION),
@@ -31,7 +32,7 @@ void initSkybox(void)
 
     SetShaderValue(shdrCubemap, GetShaderLocation(shdrCubemap, "equirectangularMap"), (int[1]){ 0 }, SHADER_UNIFORM_INT);
 
-    Image img = LoadImage("../resources/skybox31.png");
+    Image img = LoadImage("../resources/img/skybox.png");
     skybox.materials[0].maps[MATERIAL_MAP_CUBEMAP].texture = LoadTextureCubemap(img, CUBEMAP_LAYOUT_AUTO_DETECT);    // CUBEMAP_LAYOUT_PANORAMA
     UnloadImage(img);
 }
