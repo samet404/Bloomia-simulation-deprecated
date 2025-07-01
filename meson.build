@@ -66,7 +66,8 @@ inc_dir = include_directories(
 
 sources = files(
   'src/game/main.c',
-  'src/skybox.c'
+  'src/skybox.c',
+  'src/shaders.c',
 )
 
 executable(

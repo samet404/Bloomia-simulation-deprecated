@@ -1,7 +1,10 @@
 #include "raylib.h"
 #include "rcamera.h"
+#include "shaders.h"
 #include "skybox.h"
 #include <stdio.h>
+
+#include "raymath.h"
 
 #define MAX_COLUMNS 20
 
@@ -20,8 +23,16 @@ int main(void)
     const int fps = 60;
 
 
+
+    // We are making window resizeable
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);  // Enable Multi Sampling Anti Aliasing 4x (if available)
+
     InitWindow(screenWidth, screenHeight, "Bloomia sim");
+
     initSkybox();
+    bool wasWindowMinimized = false;
+
 
     // Define the camera to look into our 3d world (position, target, up vector)
     Camera camera = { 0 };
@@ -33,14 +44,40 @@ int main(void)
     float lastCameraRotationYaw = 0.0f;
     float lastCameraRotationPitch = 0.0f;
 
-
-    bool wasWindowMinimized = false;
-
-    // We are making window resizeable
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-
     SetExitKey(KEY_NULL);
     SetTargetFPS(fps);                   // Set our game to run at 60 frames-per-second
+
+    Shader shader;
+    initShaders(&shader);
+
+    // Clear here
+    Model modelA;
+    Model modelB;
+    Model modelC;
+    Texture texture;
+
+    // Load models and texture
+    modelA = LoadModelFromMesh(GenMeshTorus(0.4f, 1.0f, 16, 32));
+    modelB = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
+    modelC = LoadModelFromMesh(GenMeshSphere(0.5f, 32, 32));
+    texture = LoadTexture("../resources/img/texel_checker.png");
+
+    // Assign texture to default model material
+    modelA.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    modelB.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    modelC.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
+    // NOTE: All models share the same shader
+    modelA.materials[0].shader = shader;
+    modelB.materials[0].shader = shader;
+    modelC.materials[0].shader = shader;
+
+    // Create a plane mesh and model
+    Mesh planeMesh = GenMeshPlane(32, 32, 50, 50);
+    Model planeModel = LoadModelFromMesh(planeMesh);
+    planeModel.materials[0].shader = shader;
+    planeModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
 
     //--------------------------------------------------------------------------------------
     // Main game loop
@@ -51,7 +88,7 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
 
-        if (IsWindowMinimized()) wasWindowMinimized = true;
+        updateShaders(&camera, &shader);
 
         // Camera system ----------------
         // We are rotating camera based on mouse sensitivity
@@ -85,18 +122,32 @@ int main(void)
         BeginDrawing();
         ClearBackground(RAYWHITE);
         BeginMode3D(camera);
-
         drawSkybox();
-        DrawPlane((Vector3){ 0.0f, 0.0f, 0.0f }, (Vector2){ 32.0f, 32.0f }, (Color){115, 196, 197, 255}); // Draw ground
+
+        // Draw the three models
+        DrawModel(modelA, (Vector3){ 10.6f, 40, 0 }, 1.0f, WHITE);
+        DrawModel(modelB, (Vector3){ -2.6f, 40, 0 }, 1.0f, WHITE);
+        DrawModel(modelC, (Vector3){ 2.6f, 40, 0 }, 1.0f, WHITE);
+
+        for (int i = -20; i < 20; i += 2) DrawModel(modelA,(Vector3){ (float)i, 0, 2 }, 1.0f, WHITE);
+
+        DrawModel(planeModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, (Color){115, 196, 197, 255}); // Draw ground
 
         EndMode3D();
         EndDrawing();
 
         if (IsWindowFocused()) wasWindowMinimized = false;
+        if (IsWindowMinimized()) wasWindowMinimized = true;
     }
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
+
+    UnloadModel(modelA);        // Unload model A
+    UnloadModel(modelB);        // Unload model B
+    UnloadModel(modelC);        // Unload model C
+    UnloadTexture(texture);     // Unload texture
+    UnloadShader(shader);
 
     deInitSkybox();
     CloseWindow();        // Close window and OpenGL context
