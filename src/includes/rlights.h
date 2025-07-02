@@ -47,7 +47,7 @@ typedef struct {
     int type;
     bool enabled;
     Vector3 position;
-    Vector3 target;
+    Vector3 direction;
     Color color;
     float attenuation;
     
@@ -55,7 +55,7 @@ typedef struct {
     int enabledLoc;
     int typeLoc;
     int positionLoc;
-    int targetLoc;
+    int directionLoc;
     int colorLoc;
     int attenuationLoc;
 } Light;
@@ -73,7 +73,7 @@ extern "C" {            // Prevents name mangling of functions
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
 //----------------------------------------------------------------------------------
-Light CreateLight(int type, Vector3 position, Vector3 target, Color color, Shader shader);   // Create a light and get shader locations
+Light CreateLight(int type, Vector3 position, Vector3 direction, Color color, Shader shader);   // Create a light and get shader locations
 void UpdateLightValues(Shader shader, Light light);         // Send light properties to shader
 
 #ifdef __cplusplus
@@ -118,7 +118,7 @@ static int lightsCount = 0;    // Current amount of created lights
 //----------------------------------------------------------------------------------
 
 // Create a light and get shader locations
-Light CreateLight(int type, Vector3 position, Vector3 target, Color color, Shader shader)
+Light CreateLight(int type, Vector3 position, Vector3 direction, Color color, Shader shader)
 {
     Light light = { 0 };
 
@@ -127,14 +127,14 @@ Light CreateLight(int type, Vector3 position, Vector3 target, Color color, Shade
         light.enabled = true;
         light.type = type;
         light.position = position;
-        light.target = target;
+        light.direction = direction;
         light.color = color;
 
         // NOTE: Lighting shader naming must be the provided ones
         light.enabledLoc = GetShaderLocation(shader, TextFormat("lights[%i].enabled", lightsCount));
         light.typeLoc = GetShaderLocation(shader, TextFormat("lights[%i].type", lightsCount));
         light.positionLoc = GetShaderLocation(shader, TextFormat("lights[%i].position", lightsCount));
-        light.targetLoc = GetShaderLocation(shader, TextFormat("lights[%i].target", lightsCount));
+        light.directionLoc = GetShaderLocation(shader, TextFormat("lights[%i].direction", lightsCount));
         light.colorLoc = GetShaderLocation(shader, TextFormat("lights[%i].color", lightsCount));
 
         UpdateLightValues(shader, light);
@@ -158,8 +158,8 @@ void UpdateLightValues(Shader shader, Light light)
     SetShaderValue(shader, light.positionLoc, position, SHADER_UNIFORM_VEC3);
 
     // Send to shader light target position values
-    float target[3] = { light.target.x, light.target.y, light.target.z };
-    SetShaderValue(shader, light.targetLoc, target, SHADER_UNIFORM_VEC3);
+    float target[3] = { light.direction.x, light.direction.y, light.direction.z };
+    SetShaderValue(shader, light.directionLoc, target, SHADER_UNIFORM_VEC3);
 
     // Send to shader light color values
     float color[4] = { (float)light.color.r/(float)255, (float)light.color.g/(float)255, 

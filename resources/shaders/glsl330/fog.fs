@@ -29,7 +29,7 @@ struct Light {
     int enabled;
     int type;
     vec3 position;
-    vec3 target;
+    vec3 direction;
     vec4 color;
 };
 
@@ -56,7 +56,7 @@ void main()
         {
             vec3 light = vec3(0.0);
 
-            if (lights[i].type == LIGHT_DIRECTIONAL) light = -normalize(lights[i].target - lights[i].position);
+            if (lights[i].type == LIGHT_DIRECTIONAL) light = normalize(-lights[i].direction);
             if (lights[i].type == LIGHT_POINT) light = normalize(lights[i].position - fragPosition);
 
             float NdotL = max(dot(normal, light), 0.0);
@@ -89,7 +89,7 @@ void main()
     //const float fogEnd = 10.0;
     //float fogFactor = (fogEnd - dist)/(fogEnd - fogStart);
 
-    fogFactor = clamp(fogFactor, 0.0, 1.0);
+    fogFactor = clamp(fogFactor,0.0, 1.0);
 
     finalColor = mix(fogColor, finalColor, fogFactor);
 }
