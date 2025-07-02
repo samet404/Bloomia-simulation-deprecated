@@ -18,7 +18,7 @@
     #define GLSL_VERSION            100
 #endif
 
-float fogDensity = 0.10f;
+float fogDensity = 0.05f;
 int fogDensityLoc = 0;
 int ambientLoc = 0;
 

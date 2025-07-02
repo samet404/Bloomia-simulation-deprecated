@@ -82,7 +82,7 @@ void main()
     //const float fogDensity = 0.16;
 
     // Exponential fog
-    float fogFactor = 1.0/exp((dist*fogDensity)*(dist*fogDensity));
+    float fogFactor = 40.0/exp((dist*fogDensity)*(dist*fogDensity));
 
     // Linear fog (less nice)
     //const float fogStart = 2.0;
