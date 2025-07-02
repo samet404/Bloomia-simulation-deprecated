@@ -5,8 +5,10 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 #include "raylib.h"
+#define TERRAIN_SIZE 100
+#define TERRAIN_SCALE 1.0f
 
 #endif //TERRAIN_H
 
-void getTerrainHeightAt(float x, float z);
+float getTerrainHeightAt(float x, float z);
 Mesh GenTerrainMesh(void);

@@ -6,6 +6,8 @@
 #include "terrain.h"
 
 #include "raymath.h"
+#define CAMERA_SMOOTH_SPEED 0.2f
+#define HEIGHT_THRESHOLD 0.01f
 
 #define MAX_COLUMNS 20
 
@@ -37,13 +39,15 @@ int main(void)
 
     // Define the camera to look into our 3d world (position, target, up vector)
     Camera camera = { 0 };
-    camera.position = (Vector3){ 0.0f, 2.0f, 4.0f };    // Camera position
+    camera.position = (Vector3){ 0.0f, 7.0f, 4.0f };    // Camera position
     camera.target = (Vector3){ 0.0f, 2.0f, 0.0f };      // Camera looking at point
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 60.0f;                                // Camera field-of-view Y
     camera.projection = CAMERA_PERSPECTIVE;             // Camera projection type
     float lastCameraRotationYaw = 0.0f;
     float lastCameraRotationPitch = 0.0f;
+    float moveCameraPosTo = 0.0f;
+    float currentTerrainHeightAtCameraPos = 0.0f;
 
     SetExitKey(KEY_NULL);
     SetTargetFPS(fps);                   // Set our game to run at 60 frames-per-second
@@ -80,6 +84,7 @@ int main(void)
     terrainModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
 
+
     //--------------------------------------------------------------------------------------
     // Main game loop
     //--------------------------------------------------------------------------------------
@@ -105,12 +110,12 @@ int main(void)
                 (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))*0.1f,
                 (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))*0.1f -   // Move right-left
                 (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))*0.1f,
-                0.0f                                                // Move up-down
+                moveCameraPosTo                                                // Move up-down
             },
             (Vector3){
                 lastCameraRotationYaw,         // Rotation: yaw
                 lastCameraRotationPitch,                            // Rotation: pitch
-                0.0f                                                // Rotation: roll
+                0.0f                              // Rotation: roll
             }, 0); // Move to target (zoom)
 
 
@@ -135,11 +140,38 @@ int main(void)
         DrawModel(terrainModel, (Vector3){ 0.0f, 0.0f, 0.0f }, 1.0f, (Color){115, 196, 197, 255}); // Draw ground
 
         EndMode3D();
+
+        DrawText(TextFormat("camera pos: %f %f %f", camera.position.x, camera.position.y, camera.position.z), 10, 10, 20, BLACK);
+        DrawText(TextFormat("getTerrainHeight %f",getTerrainHeightAt(camera.position.x, camera.position.z)), 10, 70, 20, BLACK);
+        DrawText(TextFormat("prevTerrainHeight %f",currentTerrainHeightAtCameraPos), 10, 100, 20, BLACK);
+        DrawText(TextFormat("movecameraposto %f",moveCameraPosTo), 10, 50, 20, BLACK);
+
         EndDrawing();
+
+
+
+        //--------------------------------------------------------------------------------------
+        // End operations
+        //--------------------------------------------------------------------------------------
 
         if (IsWindowFocused()) wasWindowMinimized = false;
         if (IsWindowMinimized()) wasWindowMinimized = true;
-    }
+
+
+        // Replace the height adjustment code at the bottom of the main loop with:
+        float terrainX = (camera.position.x / TERRAIN_SCALE) + TERRAIN_SIZE / 2.0f;
+        float terrainZ = (camera.position.z / TERRAIN_SCALE) + TERRAIN_SIZE / 2.0f;
+
+        float newCurrentTerrainHeightAtCameraPos = getTerrainHeightAt(terrainX, terrainZ) + 2 ;
+        float heightDifference = newCurrentTerrainHeightAtCameraPos - camera.position.y;
+
+        if (fabs(heightDifference) > HEIGHT_THRESHOLD) {
+            moveCameraPosTo = heightDifference * CAMERA_SMOOTH_SPEED;
+        } else {
+            moveCameraPosTo = 0.0f;
+        }
+
+        currentTerrainHeightAtCameraPos = newCurrentTerrainHeightAtCameraPos;    }
 
     // De-Initialization
     //--------------------------------------------------------------------------------------

@@ -1,11 +1,11 @@
 //
 // Created by notfound404 on 7/1/25.
 //
+#include "terrain.h"
+
 #include <math.h>
 #include "raylib.h"
 
-#define TERRAIN_SIZE 100
-#define TERRAIN_SCALE 1.0f
 
 // Function to generate height at any point
 // Also can be used to replace objects on top of terrain like player's camera, models
@@ -51,7 +51,7 @@ Mesh GenTerrainMesh(void)
             // - Y coordinate comes from height function
             mesh.vertices[vCounter] = (x - TERRAIN_SIZE / 2.0f) * TERRAIN_SCALE;
             mesh.vertices[vCounter + 1] = getTerrainHeightAt(x, z);
-            mesh.vertices[vCounter + 2] = (z - TERRAIN_SCALE/2.0f) * TERRAIN_SCALE;
+            mesh.vertices[vCounter + 2] = (z - TERRAIN_SIZE/2.0f) * TERRAIN_SCALE;
             vCounter += 3;
 
             // Calculate texture coordinates (0 to 1 range)
