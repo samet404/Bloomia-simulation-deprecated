@@ -11,8 +11,25 @@
 // Also can be used to replace objects on top of terrain like player's camera, models
 float getTerrainHeightAt(float x, float z)
 {
-    // simple sin wave terrain
-    return 2.0f * sinf(x * 0.1f) * cosf(z * 0.2f);
+    float amplitude = 1.0f;
+    float frequency = 0.1f;
+    float height = 0.0f;
+    float maxValue = 0.0f;
+    
+    // We'll use 4 octaves of noise
+    for(int i = 0; i < 4; i++)
+    {
+        height += amplitude * (sinf(x * frequency) * cosf(z * frequency));
+        maxValue += amplitude;
+        amplitude *= 0.5f;    // Reduce amplitude for each octave
+        frequency *= 2.0f;    // Double the frequency for each octave
+    }
+    
+    // Normalize the height
+    height /= maxValue;
+    
+    // Scale the final height to desired range
+    return height * 1.4f;
 }
 
 Mesh GenTerrainMesh(void)

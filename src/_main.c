@@ -6,7 +6,7 @@
 #include "terrain.h"
 
 #include "raymath.h"
-#define CAMERA_SMOOTH_SPEED 0.2f
+#define CAMERA_SMOOTH_SPEED 0.05f
 #define HEIGHT_THRESHOLD 0.01f
 
 #define MAX_COLUMNS 20
